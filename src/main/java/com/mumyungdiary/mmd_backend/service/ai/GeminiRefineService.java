@@ -33,7 +33,7 @@ public class GeminiRefineService {
     private final ChatClient chatClient;
     private final GeminiPromptFactory promptFactory;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public GeminiRefineResult refineDiary(Long userId, Long diaryId, RefineType type) {
         checkUsageLimit(userId);
 
