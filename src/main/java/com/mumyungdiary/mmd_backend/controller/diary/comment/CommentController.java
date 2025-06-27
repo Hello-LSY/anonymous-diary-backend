@@ -1,6 +1,5 @@
 package com.mumyungdiary.mmd_backend.controller.diary.comment;
 
-import com.mumyungdiary.mmd_backend.controller.comment.dto.*;
 import com.mumyungdiary.mmd_backend.controller.diary.comment.dto.CommentCreateRequest;
 import com.mumyungdiary.mmd_backend.controller.diary.comment.dto.CommentCreateResponse;
 import com.mumyungdiary.mmd_backend.controller.diary.comment.dto.CommentDto;

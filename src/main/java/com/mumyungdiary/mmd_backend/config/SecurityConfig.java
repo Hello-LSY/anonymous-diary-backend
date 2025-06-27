@@ -1,8 +1,8 @@
 package com.mumyungdiary.mmd_backend.config;
 
+import com.mumyungdiary.mmd_backend.repository.auth.UserRepository;
 import com.mumyungdiary.mmd_backend.security.jwt.JwtAuthenticationFilter;
 import com.mumyungdiary.mmd_backend.security.jwt.JwtTokenProvider;
-import com.mumyungdiary.mmd_backend.repository.auth.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

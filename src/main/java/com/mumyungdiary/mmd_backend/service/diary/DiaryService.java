@@ -1,9 +1,9 @@
 package com.mumyungdiary.mmd_backend.service.diary;
 
-import com.mumyungdiary.mmd_backend.domain.diary.Diary;
 import com.mumyungdiary.mmd_backend.domain.auth.User;
-import com.mumyungdiary.mmd_backend.repository.diary.DiaryRepository;
+import com.mumyungdiary.mmd_backend.domain.diary.Diary;
 import com.mumyungdiary.mmd_backend.repository.auth.UserRepository;
+import com.mumyungdiary.mmd_backend.repository.diary.DiaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;

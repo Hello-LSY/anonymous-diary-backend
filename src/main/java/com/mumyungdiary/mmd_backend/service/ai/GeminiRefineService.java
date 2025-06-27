@@ -1,9 +1,9 @@
 package com.mumyungdiary.mmd_backend.service.ai;
 
 import com.mumyungdiary.mmd_backend.controller.diary.comment.refine.dto.GeminiRefineResult;
+import com.mumyungdiary.mmd_backend.domain.common.enums.RefineType;
 import com.mumyungdiary.mmd_backend.domain.diary.AiUsageLog;
 import com.mumyungdiary.mmd_backend.domain.diary.Diary;
-import com.mumyungdiary.mmd_backend.domain.common.enums.RefineType;
 import com.mumyungdiary.mmd_backend.repository.diary.AiUsageLogRepository;
 import com.mumyungdiary.mmd_backend.repository.diary.DiaryRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.mumyungdiary.mmd_backend.service.auth;
 
-import com.mumyungdiary.mmd_backend.domain.auth.User;
 import com.mumyungdiary.mmd_backend.domain.auth.MagicLinkToken;
+import com.mumyungdiary.mmd_backend.domain.auth.User;
 import com.mumyungdiary.mmd_backend.repository.auth.MagicLinkTokenRepository;
 import com.mumyungdiary.mmd_backend.repository.auth.UserRepository;
 import com.mumyungdiary.mmd_backend.security.jwt.JwtTokenProvider;

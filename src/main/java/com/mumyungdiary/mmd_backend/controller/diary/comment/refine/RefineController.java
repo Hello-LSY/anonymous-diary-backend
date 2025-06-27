@@ -4,7 +4,6 @@ import com.mumyungdiary.mmd_backend.controller.diary.comment.refine.dto.GeminiRe
 import com.mumyungdiary.mmd_backend.controller.diary.comment.refine.dto.RefineRequest;
 import com.mumyungdiary.mmd_backend.controller.diary.comment.refine.dto.RefineResponse;
 import com.mumyungdiary.mmd_backend.controller.diary.comment.refine.dto.RefineUpdateRequest;
-import com.mumyungdiary.mmd_backend.controller.refine.dto.*;
 import com.mumyungdiary.mmd_backend.security.auth.UserPrincipal;
 import com.mumyungdiary.mmd_backend.service.ai.GeminiRefineService;
 import lombok.RequiredArgsConstructor;
