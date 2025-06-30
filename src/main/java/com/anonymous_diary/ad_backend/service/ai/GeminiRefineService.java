@@ -61,6 +61,8 @@ public class GeminiRefineService {
     public void updateRefinedContent(Long userId, Long diaryId, String refinedContent) {
         Diary diary = getOwnedDiary(userId, diaryId);
         diary.updateContent(refinedContent);
+        diary.markAsAiRefined();
+
     }
 
     private void checkUsageLimit(Long userId) {

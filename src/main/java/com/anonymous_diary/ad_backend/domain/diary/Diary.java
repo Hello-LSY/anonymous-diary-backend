@@ -59,5 +59,8 @@ public class Diary {
         this.content = newContent;
     }
 
+    public void markAsAiRefined() {
+        this.aiRefined = true;
+    }
 }
 
