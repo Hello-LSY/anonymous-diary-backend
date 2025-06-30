@@ -44,4 +44,8 @@ public class Comment {
     public void updateContent(String content) {
         this.content = content;
     }
+
+    public boolean isOwnedBy(Long userId) {
+        return this.user.getId().equals(userId);
+    }
 }

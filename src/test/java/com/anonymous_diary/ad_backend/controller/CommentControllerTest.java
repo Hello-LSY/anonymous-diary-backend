@@ -72,7 +72,7 @@ class CommentControllerTest {
         mockMvc.perform(get("/api/comments/" + diaryId)
                         .header("Authorization", "Bearer " + jwt))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nickname").value("무명테스트"))
+                .andExpect(jsonPath("$[0].title").value("무명테스트"))
                 .andExpect(jsonPath("$[0].content").value("첫 번째 댓글"));
 
 
