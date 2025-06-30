@@ -1,10 +1,13 @@
 package com.anonymous_diary.ad_backend.service.diary;
 
+import com.anonymous_diary.ad_backend.controller.diary.dto.*;
 import com.anonymous_diary.ad_backend.domain.auth.User;
 import com.anonymous_diary.ad_backend.domain.diary.Diary;
 import com.anonymous_diary.ad_backend.repository.auth.UserRepository;
 import com.anonymous_diary.ad_backend.repository.diary.DiaryRepository;
+import com.anonymous_diary.ad_backend.repository.diary.DiaryViewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final UserRepository userRepository;
+    private final DiaryViewRepository diaryViewRepository;
 
     @Transactional
     public Long createDiary(Long userId, String content, boolean allowComment, boolean visible) {
@@ -41,36 +45,65 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public Diary getDiaryByIdWithAccess(Long diaryId, Long currentUserId) {
+    public DiaryDetailDto getDiaryDetailWithAccess(Long diaryId, Long currentUserId) {
         Diary diary = getDiary(diaryId);
-
         if (!diary.isVisible() && !diary.isOwnedBy(currentUserId)) {
             throw new AccessDeniedException(PRIVATE_DIARY);
         }
-
-        return diary;
+        return new DiaryDetailDto(
+                diary.getId(),
+                diary.getUser().getNickname(),
+                diary.getContent(),
+                diary.isAllowComment(),
+                diary.isVisible(),
+                diary.isAiRefined(),
+                diary.getCreatedAt()
+        );
     }
 
     @Transactional(readOnly = true)
-    public List<Diary> getDiariesByUser(Long userId) {
+    public List<UserDiarySummaryDto> getMyDiarySummaries(Long userId) {
         User user = getUser(userId);
-        return diaryRepository.findAllByUserOrderByCreatedAtDesc(user);
+        List<Diary> diaries = diaryRepository.findAllByUserOrderByCreatedAtDesc(user);
+        return diaries.stream()
+                .map(d -> new UserDiarySummaryDto(
+                        d.getId(),
+                        d.getContent(),
+                        d.isAllowComment(),
+                        d.isVisible(),
+                        d.isAiRefined(),
+                        d.getCreatedAt()
+                ))
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Diary> getPublicDiaries() {
-        return diaryRepository.findAllByVisibleTrueOrderByCreatedAtDesc();
+    public List<VisibleDiarySummaryDto> getPublicDiarySummaries(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Diary> diaries = diaryRepository.findAllByVisibleTrue(pageable);
+
+        List<Long> viewedIds = diaryViewRepository.findViewedDiaryIdsByUserId(userId);
+
+        return diaries.stream()
+                .map(d -> new VisibleDiarySummaryDto(
+                        d.getId(),
+                        d.getId() + "번째 일기",
+                        d.getContent(),
+                        d.isAllowComment(),
+                        d.isAiRefined(),
+                        d.getCreatedAt(),
+                        viewedIds.contains(d.getId())
+                ))
+                .toList();
     }
 
     @Transactional
     public void updateDiary(Long diaryId, Long userId, String content, boolean allowComment, boolean visible) {
         Diary diary = getDiary(diaryId);
         validateOwnership(diary, userId);
-
         if (!diary.isEditable()) {
             throw new IllegalStateException(EDIT_EXPIRED);
         }
-
         diary.update(content, allowComment, visible);
     }
 
@@ -82,7 +115,6 @@ public class DiaryService {
     }
 
     // ===== 내부 헬퍼 =====
-
     private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND));

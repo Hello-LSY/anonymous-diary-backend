@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 
 public record VisibleDiarySummaryDto(
         Long id,
-        String nickname,
+        String title,
         String content,
         boolean allowComment,
         boolean aiRefined,
-        LocalDateTime createdAt
-) {
-}
+        LocalDateTime createdAt,
+        boolean viewed
+) {}
