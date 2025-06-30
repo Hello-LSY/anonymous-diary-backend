@@ -44,7 +44,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(TEST_USER_ID))
-                .andExpect(jsonPath("$.nickname").value("Tester"))
+                .andExpect(jsonPath("$.title").value("Tester"))
                 .andExpect(jsonPath("$.email").value("test@example.com"));
     }
 }

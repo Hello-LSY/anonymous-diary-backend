@@ -80,6 +80,6 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").exists())
                 .andExpect(jsonPath("$.id").value(user.getId()))
-                .andExpect(jsonPath("$.nickname").value(nickname));
+                .andExpect(jsonPath("$.title").value(nickname));
     }
 }
