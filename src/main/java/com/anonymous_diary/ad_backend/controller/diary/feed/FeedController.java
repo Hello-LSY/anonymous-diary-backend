@@ -6,7 +6,10 @@ import com.anonymous_diary.ad_backend.service.diary.FeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -17,12 +20,15 @@ public class FeedController {
 
     private final FeedService feedService;
 
-    @GetMapping("/random")
-    public ResponseEntity<List<VisibleDiarySummaryDto>> getRandomFeed(
+    // 무한스크롤
+    @GetMapping("/recent")
+    public ResponseEntity<List<VisibleDiarySummaryDto>> getRecentFeed(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestParam(value = "limit", defaultValue = "9") int limit
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        List<VisibleDiarySummaryDto> feed = feedService.getRandomRecentDiaries(principal.id(), limit);
+        List<VisibleDiarySummaryDto> feed = feedService.getRecentDiaries(principal.id(), page, size);
         return ResponseEntity.ok(feed);
     }
+
 }

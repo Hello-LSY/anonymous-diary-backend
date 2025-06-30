@@ -62,7 +62,7 @@ class DiaryControllerTest {
                         .header("Authorization", "Bearer " + jwt))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("일기 작성 테스트"))
-                .andExpect(jsonPath("$.nickname").value("무명테스트"));
+                .andExpect(jsonPath("$.title").value("무명테스트"));
 
         // 3. Update
         DiaryUpdateRequest updateRequest = new DiaryUpdateRequest(
