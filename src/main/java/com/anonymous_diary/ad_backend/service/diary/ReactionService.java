@@ -1,5 +1,7 @@
 package com.anonymous_diary.ad_backend.service.diary;
 
+import com.anonymous_diary.ad_backend.controller.diary.reaction.dto.ReactionDto;
+import com.anonymous_diary.ad_backend.controller.diary.reaction.dto.ReactionToggleResponse;
 import com.anonymous_diary.ad_backend.domain.auth.User;
 import com.anonymous_diary.ad_backend.domain.common.enums.ReactionResult;
 import com.anonymous_diary.ad_backend.domain.common.enums.ReactionType;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +29,9 @@ public class ReactionService {
     private final DiaryRepository diaryRepository;
 
     @Transactional
-    public ReactionResult toggleReaction(Long userId, Long diaryId, ReactionType type) {
+    public ReactionToggleResponse toggleReaction(Long userId, Long diaryId, ReactionType type) {
         Reaction existing = reactionRepository.findByUserIdAndDiaryId(userId, diaryId).orElse(null);
+        ReactionResult result;
 
         if (existing == null) {
             User user = findUser(userId);
@@ -41,21 +45,26 @@ public class ReactionService {
                     .createdAt(LocalDateTime.now())
                     .build();
             reactionRepository.save(newReaction);
-            return ReactionResult.CREATED;
+            result = ReactionResult.CREATED;
 
         } else if (existing.getType() == type) {
             reactionRepository.delete(existing);
-            return ReactionResult.DELETED;
+            result = ReactionResult.DELETED;
 
         } else {
             existing.updateType(type);
-            return ReactionResult.UPDATED;
+            result = ReactionResult.UPDATED;
         }
+
+        return new ReactionToggleResponse(result.name());
     }
 
     @Transactional
-    public List<Reaction> getReactionsByDiary(Long diaryId) {
-        return reactionRepository.findAllByDiaryId(diaryId);
+    public List<ReactionDto> getReactionsByDiary(Long diaryId) {
+        List<Reaction> reactions = reactionRepository.findAllByDiaryId(diaryId);
+        return reactions.stream()
+                .map(r -> new ReactionDto(r.getUser().getNickname(), r.getType()))
+                .collect(Collectors.toList());
     }
 
     private User findUser(Long id) {
@@ -73,5 +82,4 @@ public class ReactionService {
             throw new AccessDeniedException("비공개 일기에 리액션을 남길 수 없습니다.");
         }
     }
-
 }
