@@ -21,28 +21,20 @@ public class DiaryController {
     public ResponseEntity<DiaryCreateResponse> createDiary(
             @RequestBody DiaryCreateRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        Long diaryId = diaryService.createDiary(
-                principal.id(),
-                request.content(),
-                request.allowComment(),
-                request.visible()
-        );
-        return ResponseEntity.ok(new DiaryCreateResponse(diaryId));
+        return ResponseEntity.ok(diaryService.createDiary(principal.id(), request));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DiaryDetailDto> getDiary(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal principal) {
-        DiaryDetailDto response = diaryService.getDiaryDetailWithAccess(id, principal.id());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(diaryService.getDiaryDetailWithAccess(id, principal.id()));
     }
 
     @GetMapping("/me")
     public ResponseEntity<List<UserDiarySummaryDto>> getMyDiaries(
             @AuthenticationPrincipal UserPrincipal principal) {
-        List<UserDiarySummaryDto> response = diaryService.getMyDiarySummaries(principal.id());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(diaryService.getMyDiarySummaries(principal.id()));
     }
 
     @GetMapping("/public")
@@ -50,8 +42,7 @@ public class DiaryController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal UserPrincipal principal) {
-        List<VisibleDiarySummaryDto> response = diaryService.getPublicDiarySummaries(principal.id(), page, size);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(diaryService.getPublicDiarySummaries(principal.id(), page, size));
     }
 
     @PutMapping("/{id}")
@@ -59,7 +50,7 @@ public class DiaryController {
             @PathVariable Long id,
             @RequestBody DiaryUpdateRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        diaryService.updateDiary(id, principal.id(), request.content(), request.allowComment(), request.visible());
+        diaryService.updateDiary(id, principal.id(), request);
         return ResponseEntity.noContent().build();
     }
 

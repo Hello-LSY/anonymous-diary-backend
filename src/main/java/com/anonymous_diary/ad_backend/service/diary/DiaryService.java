@@ -30,18 +30,18 @@ public class DiaryService {
     private final DiaryViewRepository diaryViewRepository;
 
     @Transactional
-    public Long createDiary(Long userId, String content, boolean allowComment, boolean visible) {
+    public DiaryCreateResponse createDiary(Long userId, DiaryCreateRequest request) {
         User user = getUser(userId);
-
         Diary diary = Diary.builder()
                 .user(user)
-                .content(content)
-                .allowComment(allowComment)
-                .visible(visible)
+                .content(request.content())
+                .allowComment(request.allowComment())
+                .visible(request.visible())
                 .aiRefined(false)
                 .build();
 
-        return diaryRepository.save(diary).getId();
+        Diary saved = diaryRepository.save(diary);
+        return new DiaryCreateResponse(saved.getId());
     }
 
     @Transactional(readOnly = true)
@@ -81,7 +81,6 @@ public class DiaryService {
     public List<VisibleDiarySummaryDto> getPublicDiarySummaries(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Diary> diaries = diaryRepository.findAllByVisibleTrue(pageable);
-
         List<Long> viewedIds = diaryViewRepository.findViewedDiaryIdsByUserId(userId);
 
         return diaries.stream()
@@ -98,13 +97,13 @@ public class DiaryService {
     }
 
     @Transactional
-    public void updateDiary(Long diaryId, Long userId, String content, boolean allowComment, boolean visible) {
+    public void updateDiary(Long diaryId, Long userId, DiaryUpdateRequest request) {
         Diary diary = getDiary(diaryId);
         validateOwnership(diary, userId);
         if (!diary.isEditable()) {
             throw new IllegalStateException(EDIT_EXPIRED);
         }
-        diary.update(content, allowComment, visible);
+        diary.update(request.content(), request.allowComment(), request.visible());
     }
 
     @Transactional
@@ -115,6 +114,7 @@ public class DiaryService {
     }
 
     // ===== 내부 헬퍼 =====
+
     private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND));
