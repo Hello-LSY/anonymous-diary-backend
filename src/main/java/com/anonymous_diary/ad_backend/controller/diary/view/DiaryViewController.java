@@ -18,6 +18,7 @@ public class DiaryViewController {
 
     private final DiaryViewService diaryViewService;
 
+    //조회기록 갱신
     @PostMapping
     public ResponseEntity<Void> markAsViewed(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -27,6 +28,7 @@ public class DiaryViewController {
         return ResponseEntity.ok().build();
     }
 
+    //조회
     @GetMapping("/me")
     public ResponseEntity<List<Long>> getViewedDiaries(
             @AuthenticationPrincipal UserPrincipal principal

@@ -28,7 +28,10 @@ public class MagicLinkService {
     @Value("${app.magic-link.base-url}")
     private String baseUrl;
 
-    public void sendLoginLink(String email) throws MessagingException {
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+
+    public void sendLoginLink(String email) {
         log.info("[MagicLinkService] Magic Link 발급 시도: {}", email);
 
         String token = UUID.randomUUID().toString();
@@ -46,10 +49,14 @@ public class MagicLinkService {
         String link = baseUrl + "/api/auth/verify?token=" + token;
         log.info("[MagicLinkService] Magic Link 생성 완료: {}", link);
 
-        sendMail(email, link);
-        log.info("[MagicLinkService] 메일 전송 시도 완료");
+        try {
+            sendMail(email, link);
+            log.info("[MagicLinkService] 메일 전송 완료: {}", email);
+        } catch (MessagingException e) {
+            log.error("[MagicLinkService] 메일 전송 실패: {}", e.getMessage(), e);
+            throw new RuntimeException("메일 전송에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+        }
     }
-
 
     private void sendMail(String to, String link) throws MessagingException {
         var message = mailSender.createMimeMessage();
@@ -57,11 +64,15 @@ public class MagicLinkService {
         helper.setTo(to);
         helper.setSubject("무명일기 로그인 링크");
 
-        String html = "<p>아래 링크를 클릭하여 로그인하세요:</p>" +
-                "<a href=\"" + link + "\">로그인</a>";
+        helper.setFrom(fromEmail);
+
+        String html = """
+        <p>아래 링크를 클릭하여 무명일기에 로그인하세요 (유효기간: 15분).</p>
+        <p><a href="%s">로그인하기</a></p>
+        """.formatted(link);
 
         helper.setText(html, true);
         mailSender.send(message);
     }
-}
 
+}

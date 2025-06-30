@@ -1,14 +1,17 @@
 package com.anonymous_diary.ad_backend.controller.user;
 
 import com.anonymous_diary.ad_backend.controller.user.dto.EmailRequest;
-import com.anonymous_diary.ad_backend.controller.user.dto.LoginRequest;
 import com.anonymous_diary.ad_backend.controller.user.dto.StatusResponse;
 import com.anonymous_diary.ad_backend.controller.user.dto.TokenResponse;
-import com.anonymous_diary.ad_backend.security.jwt.JwtTokenProvider;
+import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.auth.AuthService;
 import com.anonymous_diary.ad_backend.service.auth.MagicLinkService;
+import com.anonymous_diary.ad_backend.util.CookieUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,31 +19,31 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final AuthService authService;
     private final MagicLinkService magicLinkService;
 
-    @PostMapping("/test-login") // 기존 테스트 API
-    public ResponseEntity<?> loginTest(@RequestBody LoginRequest request) {
-        Long userId = 1L;
-        String token = jwtTokenProvider.generateToken(userId);
-        return ResponseEntity.ok(new TokenResponse(token));
+    @PostMapping("/request-link")
+    public ResponseEntity<StatusResponse> requestMagicLink(@RequestBody EmailRequest request) {
+        magicLinkService.sendLoginLink(request.email());
+        return ResponseEntity.ok(new StatusResponse("LINK_SENT"));
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<?> verify(@RequestParam String token) {
-        var authResponse = authService.verifyTokenAndLogin(token);
+    public ResponseEntity<?> verify(@RequestParam String token, HttpServletResponse response) {
+        var authResponse = authService.verifyTokenAndLogin(token, response);
         return ResponseEntity.ok(authResponse);
     }
 
-    @PostMapping("/request-link")
-    public ResponseEntity<?> requestMagicLink(@RequestBody EmailRequest request) {
-        try {
-            magicLinkService.sendLoginLink(request.email());
-            return ResponseEntity.ok(new StatusResponse("LINK_SENT"));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new StatusResponse("FAILED_TO_SEND"));
-        }
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = CookieUtils.extractRefreshToken(request);
+        String newAccessToken = authService.refresh(refreshToken, response);
+        return ResponseEntity.ok(new TokenResponse(newAccessToken));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<StatusResponse> logout(@AuthenticationPrincipal UserPrincipal principal) {
+        authService.logoutByUserId(principal.id());
+        return ResponseEntity.ok(new StatusResponse("LOGGED_OUT"));
+    }
 }
