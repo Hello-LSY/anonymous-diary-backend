@@ -1,5 +1,7 @@
 package com.anonymous_diary.ad_backend.service.diary;
 
+import com.anonymous_diary.ad_backend.controller.diary.comment.dto.CommentCreateResponse;
+import com.anonymous_diary.ad_backend.controller.diary.comment.dto.CommentDto;
 import com.anonymous_diary.ad_backend.domain.auth.User;
 import com.anonymous_diary.ad_backend.domain.diary.Comment;
 import com.anonymous_diary.ad_backend.domain.diary.Diary;
@@ -23,15 +25,15 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long createComment(Long userId, Long diaryId, String content) {
-        User user = findUserById(userId);
-        Diary diary = findDiaryById(diaryId);
+    public CommentCreateResponse createComment(Long userId, Long diaryId, String content) {
+        User user = getUser(userId);
+        Diary diary = getDiary(diaryId);
 
         if (!diary.isAllowComment()) {
             throw new IllegalStateException("해당 일기는 댓글을 허용하지 않습니다.");
         }
 
-        if (!diary.isVisible() && !diary.getUser().getId().equals(userId)) {
+        if (!diary.isVisible() && !diary.isOwnedBy(userId)) {
             throw new AccessDeniedException("비공개 일기에는 본인만 댓글을 달 수 있습니다.");
         }
 
@@ -41,46 +43,58 @@ public class CommentService {
                 .content(content)
                 .build();
 
-        return commentRepository.save(comment).getId();
+        Long commentId = commentRepository.save(comment).getId();
+        return new CommentCreateResponse(commentId);
     }
 
     @Transactional(readOnly = true)
-    public List<Comment> getCommentsByDiary(Long diaryId) {
-        Diary diary = findDiaryById(diaryId);
-        return commentRepository.findAllByDiaryOrderByCreatedAtAsc(diary);
+    public List<CommentDto> getCommentsByDiary(Long diaryId) {
+        Diary diary = getDiary(diaryId);
+        List<Comment> comments = commentRepository.findAllByDiaryOrderByCreatedAtAsc(diary);
+
+        return comments.stream()
+                .map(c -> new CommentDto(
+                        c.getId(),
+                        c.getUser().getNickname(),
+                        c.getContent(),
+                        c.getCreatedAt()
+                ))
+                .toList();
     }
 
     @Transactional
     public void updateComment(Long commentId, Long userId, String content) {
-        Comment comment = findCommentById(commentId);
-        validateCommentOwner(comment, userId);
+        Comment comment = getComment(commentId);
+        validateOwnership(comment, userId);
         comment.updateContent(content);
     }
 
     @Transactional
     public void deleteComment(Long commentId, Long userId) {
-        Comment comment = findCommentById(commentId);
-        validateCommentOwner(comment, userId);
+        Comment comment = getComment(commentId);
+        validateOwnership(comment, userId);
         commentRepository.delete(comment);
     }
 
-    private User findUserById(Long userId) {
+    // ===== 내부 헬퍼 메서드 =====
+
+    private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
     }
 
-    private Diary findDiaryById(Long diaryId) {
+    private Diary getDiary(Long diaryId) {
         return diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new NoSuchElementException("일기를 찾을 수 없습니다."));
     }
 
-    private Comment findCommentById(Long commentId) {
+    private Comment getComment(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchElementException("댓글을 찾을 수 없습니다."));
     }
 
-    private void validateCommentOwner(Comment comment, Long userId) {
-        if (!comment.getUser().getId().equals(userId)) {
+    private void validateOwnership(Comment comment, Long userId) {
+        if (!comment.isOwnedBy(userId)) {
             throw new AccessDeniedException("본인의 댓글만 수정/삭제할 수 있습니다.");
         }
     }
