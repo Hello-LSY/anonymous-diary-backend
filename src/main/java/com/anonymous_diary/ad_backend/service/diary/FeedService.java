@@ -49,7 +49,8 @@ public class FeedService {
                         d.isAiRefined(),
                         d.getCreatedAt(),
                         viewedIds.contains(d.getId()),
-                        d.getTotalReactionCount()
+                        d.getTotalReactionCount(),
+                        d.getCommentCount()
                 ))
                 .toList();
     }

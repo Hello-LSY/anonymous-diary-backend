@@ -13,6 +13,7 @@ public record DiaryDetailDto(
         LocalDateTime createdAt,
         int likeCount,
         int sadCount,
-        int cheerCount
+        int cheerCount,
+        int commentCount
 ) {}
 

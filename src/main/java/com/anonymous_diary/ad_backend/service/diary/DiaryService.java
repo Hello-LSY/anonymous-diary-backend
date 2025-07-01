@@ -62,7 +62,8 @@ public class DiaryService {
                 diary.getCreatedAt(),
                 diary.getLikeCount(),
                 diary.getSadCount(),
-                diary.getCheerCount()
+                diary.getCheerCount(),
+                diary.getCommentCount()
         );
     }
 
@@ -79,7 +80,8 @@ public class DiaryService {
                         d.isVisible(),
                         d.isAiRefined(),
                         d.getCreatedAt(),
-                        d.getTotalReactionCount()
+                        d.getTotalReactionCount(),
+                        d.getCommentCount()
                 ))
                 .toList();
     }
@@ -99,7 +101,8 @@ public class DiaryService {
                         d.isAiRefined(),
                         d.getCreatedAt(),
                         viewedIds.contains(d.getId()),
-                        d.getTotalReactionCount()
+                        d.getTotalReactionCount(),
+                        d.getCommentCount()
                 ))
                 .toList();
     }

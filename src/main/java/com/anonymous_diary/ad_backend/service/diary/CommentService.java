@@ -44,6 +44,10 @@ public class CommentService {
                 .build();
 
         Long commentId = commentRepository.save(comment).getId();
+
+        diary.increaseCommentCount();
+        diaryRepository.save(diary);
+
         return new CommentCreateResponse(commentId);
     }
 
@@ -73,7 +77,12 @@ public class CommentService {
     public void deleteComment(Long commentId, Long userId) {
         Comment comment = getComment(commentId);
         validateOwnership(comment, userId);
+
+        Diary diary = comment.getDiary();
         commentRepository.delete(comment);
+
+        diary.decreaseCommentCount();
+        diaryRepository.save(diary);
     }
 
     // ===== 내부 헬퍼 메서드 =====

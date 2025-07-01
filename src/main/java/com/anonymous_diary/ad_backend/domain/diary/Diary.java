@@ -50,6 +50,9 @@ public class Diary {
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
+    private int commentCount = 0;
+
+    @Column(nullable = false)
     private int likeCount = 0;
 
     @Column(nullable = false)
@@ -87,6 +90,14 @@ public class Diary {
 
     public void markAsAiRefined() {
         this.aiRefined = true;
+    }
+
+    public void increaseCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        this.commentCount--;
     }
 
     public void increaseReaction(ReactionType type) {
