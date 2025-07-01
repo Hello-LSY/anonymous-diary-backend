@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public record UserDiarySummaryDto(
         Long id,
+        String title,
         String content,
         boolean allowComment,
         boolean visible,
