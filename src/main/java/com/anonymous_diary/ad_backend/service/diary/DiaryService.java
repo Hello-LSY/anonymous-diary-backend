@@ -34,7 +34,7 @@ public class DiaryService {
         User user = getUser(userId);
         Diary diary = Diary.builder()
                 .user(user)
-                .title(request.title()) // ✅ 제목 저장
+                .title(request.title())
                 .content(request.content())
                 .allowComment(request.allowComment())
                 .visible(request.visible())
@@ -59,7 +59,10 @@ public class DiaryService {
                 diary.isAllowComment(),
                 diary.isVisible(),
                 diary.isAiRefined(),
-                diary.getCreatedAt()
+                diary.getCreatedAt(),
+                diary.getLikeCount(),
+                diary.getSadCount(),
+                diary.getCheerCount()
         );
     }
 
@@ -75,7 +78,8 @@ public class DiaryService {
                         d.isAllowComment(),
                         d.isVisible(),
                         d.isAiRefined(),
-                        d.getCreatedAt()
+                        d.getCreatedAt(),
+                        d.getTotalReactionCount()
                 ))
                 .toList();
     }
@@ -89,12 +93,13 @@ public class DiaryService {
         return diaries.stream()
                 .map(d -> new VisibleDiarySummaryDto(
                         d.getId(),
-                        d.getTitle(), // ✅ 제목 포함 (이제 가짜 title 생성 X)
+                        d.getTitle(),
                         d.getContent(),
                         d.isAllowComment(),
                         d.isAiRefined(),
                         d.getCreatedAt(),
-                        viewedIds.contains(d.getId())
+                        viewedIds.contains(d.getId()),
+                        d.getTotalReactionCount()
                 ))
                 .toList();
     }

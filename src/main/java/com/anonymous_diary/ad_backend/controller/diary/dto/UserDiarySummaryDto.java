@@ -9,5 +9,6 @@ public record UserDiarySummaryDto(
         boolean allowComment,
         boolean visible,
         boolean aiRefined,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        int totalReactionCount
 ) {}

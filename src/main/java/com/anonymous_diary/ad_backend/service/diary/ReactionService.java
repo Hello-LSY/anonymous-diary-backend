@@ -32,10 +32,10 @@ public class ReactionService {
     public ReactionToggleResponse toggleReaction(Long userId, Long diaryId, ReactionType type) {
         Reaction existing = reactionRepository.findByUserIdAndDiaryId(userId, diaryId).orElse(null);
         ReactionResult result;
+        Diary diary = findDiary(diaryId);
 
         if (existing == null) {
             User user = findUser(userId);
-            Diary diary = findDiary(diaryId);
             validateReactionAccess(diary, userId);
 
             Reaction newReaction = Reaction.builder()
@@ -45,14 +45,27 @@ public class ReactionService {
                     .createdAt(LocalDateTime.now())
                     .build();
             reactionRepository.save(newReaction);
+
+            diary.increaseReaction(type);
+            diaryRepository.save(diary);
+
             result = ReactionResult.CREATED;
 
         } else if (existing.getType() == type) {
             reactionRepository.delete(existing);
+
+            diary.decreaseReaction(type);
+            diaryRepository.save(diary);
+
             result = ReactionResult.DELETED;
 
         } else {
+            diary.decreaseReaction(existing.getType());
+            diary.increaseReaction(type);
+            diaryRepository.save(diary);
+
             existing.updateType(type);
+
             result = ReactionResult.UPDATED;
         }
 

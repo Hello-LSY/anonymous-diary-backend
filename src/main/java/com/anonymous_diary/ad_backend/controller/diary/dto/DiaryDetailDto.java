@@ -10,5 +10,9 @@ public record DiaryDetailDto(
         boolean allowComment,
         boolean visible,
         boolean aiRefined,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        int likeCount,
+        int sadCount,
+        int cheerCount
 ) {}
+
