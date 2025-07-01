@@ -34,6 +34,7 @@ public class DiaryService {
         User user = getUser(userId);
         Diary diary = Diary.builder()
                 .user(user)
+                .title(request.title()) // ✅ 제목 저장
                 .content(request.content())
                 .allowComment(request.allowComment())
                 .visible(request.visible())
@@ -53,6 +54,7 @@ public class DiaryService {
         return new DiaryDetailDto(
                 diary.getId(),
                 diary.getUser().getNickname(),
+                diary.getTitle(),
                 diary.getContent(),
                 diary.isAllowComment(),
                 diary.isVisible(),
@@ -68,6 +70,7 @@ public class DiaryService {
         return diaries.stream()
                 .map(d -> new UserDiarySummaryDto(
                         d.getId(),
+                        d.getTitle(),
                         d.getContent(),
                         d.isAllowComment(),
                         d.isVisible(),
@@ -86,7 +89,7 @@ public class DiaryService {
         return diaries.stream()
                 .map(d -> new VisibleDiarySummaryDto(
                         d.getId(),
-                        d.getId() + "번째 일기",
+                        d.getTitle(), // ✅ 제목 포함 (이제 가짜 title 생성 X)
                         d.getContent(),
                         d.isAllowComment(),
                         d.isAiRefined(),
@@ -103,7 +106,7 @@ public class DiaryService {
         if (!diary.isEditable()) {
             throw new IllegalStateException(EDIT_EXPIRED);
         }
-        diary.update(request.content(), request.allowComment(), request.visible());
+        diary.update(request.title(), request.content(), request.allowComment(), request.visible());
     }
 
     @Transactional

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public record DiaryDetailDto(
         Long id,
         String nickname,
+        String title,
         String content,
         boolean allowComment,
         boolean visible,

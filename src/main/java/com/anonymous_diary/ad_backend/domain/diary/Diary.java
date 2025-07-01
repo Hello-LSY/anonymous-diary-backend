@@ -25,6 +25,9 @@ public class Diary {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false, length = 100)
+    private String title;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
@@ -41,11 +44,13 @@ public class Diary {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public void update(String content, boolean allowComment, boolean visible) {
+    public void update(String title, String content, boolean allowComment, boolean visible) {
+        this.title = title;
         this.content = content;
         this.allowComment = allowComment;
         this.visible = visible;
     }
+
 
     public boolean isOwnedBy(Long userId) {
         return this.user.getId().equals(userId);
