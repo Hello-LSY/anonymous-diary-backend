@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -27,8 +28,9 @@ public class JwtTokenProvider {
         if (secret.length() < 32) {
             throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 characters)");
         }
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)); // 인코딩 명시
     }
+
 
     public String generateToken(Long userId) {
         Date now = new Date();
