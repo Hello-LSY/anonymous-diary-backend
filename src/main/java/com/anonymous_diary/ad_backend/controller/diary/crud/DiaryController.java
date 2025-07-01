@@ -1,6 +1,7 @@
 package com.anonymous_diary.ad_backend.controller.diary.crud;
 
 import com.anonymous_diary.ad_backend.controller.diary.dto.*;
+import com.anonymous_diary.ad_backend.domain.diary.Diary;
 import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.diary.DiaryService;
 import lombok.RequiredArgsConstructor;
