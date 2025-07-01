@@ -14,6 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -29,10 +33,18 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<?> verify(@RequestParam String token, HttpServletResponse response) {
+    public void verify(@RequestParam String token, HttpServletResponse response) throws IOException {
         var authResponse = authService.verifyTokenAndLogin(token, response);
-        return ResponseEntity.ok(authResponse);
+
+        // 프론트 콜백 경로로 전달할 URL
+        String redirectUrl = "http://localhost:3000/login/callback"
+                + "?accessToken=" + authResponse.accessToken()
+                + "&id=" + authResponse.id()
+                + "&nickname=" + URLEncoder.encode(authResponse.nickname(), StandardCharsets.UTF_8);
+
+        response.sendRedirect(redirectUrl);
     }
+
 
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
