@@ -5,10 +5,7 @@ import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.diary.DiaryViewService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -34,15 +31,16 @@ public class DiaryViewController {
 
     //조회
     @GetMapping("/me")
-    public ResponseEntity<Page<Long>> getViewedDiaries(
+    public ResponseEntity<Slice<Long>> getViewedDiaries(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Long> viewedIds = diaryViewService.getViewedDiaryIds(principal.id(), pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "viewedAt"));
+        Slice<Long> viewedIds = diaryViewService.getViewedDiaryIds(principal.id(), pageable);
         return ResponseEntity.ok(viewedIds);
     }
+
 
 
 }

@@ -4,7 +4,7 @@ import com.anonymous_diary.ad_backend.controller.diary.dto.*;
 import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.diary.DiaryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -36,21 +36,28 @@ public class DiaryController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Page<UserDiarySummaryDto>> getMyDiaries(
+    public ResponseEntity<Slice<UserDiarySummaryDto>> getMyDiaries(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok(diaryService.getMyDiarySummaries(principal.id(), page, size));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<UserDiarySummaryDto> diaries = diaryService.getMyDiarySummaries(principal.id(), pageable);
+        return ResponseEntity.ok(diaries);
     }
 
+
     @GetMapping("/public")
-    public ResponseEntity<List<VisibleDiarySummaryDto>> getPublicDiaries(
+    public ResponseEntity<Slice<VisibleDiarySummaryDto>> getPublicDiaries(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(diaryService.getPublicDiarySummaries(principal.id(), page, size));
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<VisibleDiarySummaryDto> diaries = diaryService.getPublicDiarySummaries(principal.id(), pageable);
+        return ResponseEntity.ok(diaries);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateDiary(

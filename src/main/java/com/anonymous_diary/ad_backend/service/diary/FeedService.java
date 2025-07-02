@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
 @Service
 @RequiredArgsConstructor
 public class FeedService {
@@ -25,26 +24,20 @@ public class FeedService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public Page<VisibleDiarySummaryDto> getRecentDiaries(Long userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Diary> diaryPage = diaryRepository.findAllByVisibleTrue(pageable);
-
+    public Slice<VisibleDiarySummaryDto> getRecentDiaries(Long userId, Pageable pageable) {
+        Slice<Diary> diarySlice = diaryRepository.findAllByVisibleTrue(pageable);
         Set<Long> viewedIds = new HashSet<>(diaryViewRepository.findViewedDiaryIdsByUserId(userId));
 
-        List<VisibleDiarySummaryDto> content = diaryPage.stream()
-                .map(d -> new VisibleDiarySummaryDto(
-                        d.getId(),
-                        d.getUser().getNickname(),
-                        d.getContent(),
-                        d.isAllowComment(),
-                        d.isAiRefined(),
-                        d.getCreatedAt(),
-                        viewedIds.contains(d.getId()),
-                        d.getTotalReactionCount(),
-                        d.getCommentCount()
-                ))
-                .toList();
-
-        return new PageImpl<>(content, pageable, diaryPage.getTotalElements());
+        return diarySlice.map(d -> new VisibleDiarySummaryDto(
+                d.getId(),
+                d.getUser().getNickname(),
+                d.getContent(),
+                d.isAllowComment(),
+                d.isAiRefined(),
+                d.getCreatedAt(),
+                viewedIds.contains(d.getId()),
+                d.getTotalReactionCount(),
+                d.getCommentCount()
+        ));
     }
 }

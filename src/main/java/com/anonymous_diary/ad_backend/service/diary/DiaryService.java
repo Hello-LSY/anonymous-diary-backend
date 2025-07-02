@@ -14,22 +14,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
-
-    private static final String USER_NOT_FOUND = "사용자를 찾을 수 없습니다.";
-    private static final String DIARY_NOT_FOUND = "일기를 찾을 수 없습니다.";
-    private static final String UNAUTHORIZED = "해당 일기에 대한 권한이 없습니다.";
-    private static final String EDIT_EXPIRED = "작성 후 1시간이 지난 일기는 수정할 수 없습니다.";
-    private static final String PRIVATE_DIARY = "비공개 일기입니다.";
 
     private final DiaryRepository diaryRepository;
     private final UserRepository userRepository;
     private final DiaryViewRepository diaryViewRepository;
     private final DiaryViewService diaryViewService;
 
+    private static final String USER_NOT_FOUND = "사용자를 찾을 수 없습니다.";
+    private static final String DIARY_NOT_FOUND = "일기를 찾을 수 없습니다.";
+    private static final String UNAUTHORIZED = "해당 일기에 대한 권한이 없습니다.";
+    private static final String EDIT_EXPIRED = "작성 후 1시간이 지난 일기는 수정할 수 없습니다.";
+    private static final String PRIVATE_DIARY = "비공개 일기입니다.";
 
     @Transactional
     public DiaryCreateResponse createDiary(Long userId, DiaryCreateRequest request) {
@@ -70,10 +68,9 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserDiarySummaryDto> getMyDiarySummaries(Long userId, int page, int size) {
+    public Slice<UserDiarySummaryDto> getMyDiarySummaries(Long userId, Pageable pageable) {
         User user = getUser(userId);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Diary> diaries = diaryRepository.findAllByUser(user, pageable);
+        Slice<Diary> diaries = diaryRepository.findAllByUser(user, pageable);
 
         return diaries.map(d -> new UserDiarySummaryDto(
                 d.getId(),
@@ -88,26 +85,22 @@ public class DiaryService {
         ));
     }
 
-
     @Transactional(readOnly = true)
-    public List<VisibleDiarySummaryDto> getPublicDiarySummaries(Long userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Diary> diaries = diaryRepository.findAllByVisibleTrue(pageable);
+    public Slice<VisibleDiarySummaryDto> getPublicDiarySummaries(Long userId, Pageable pageable) {
+        Slice<Diary> diaries = diaryRepository.findAllByVisibleTrue(pageable);
         List<Long> viewedIds = diaryViewRepository.findViewedDiaryIdsByUserId(userId);
 
-        return diaries.stream()
-                .map(d -> new VisibleDiarySummaryDto(
-                        d.getId(),
-                        d.getTitle(),
-                        d.getContent(),
-                        d.isAllowComment(),
-                        d.isAiRefined(),
-                        d.getCreatedAt(),
-                        viewedIds.contains(d.getId()),
-                        d.getTotalReactionCount(),
-                        d.getCommentCount()
-                ))
-                .toList();
+        return diaries.map(d -> new VisibleDiarySummaryDto(
+                d.getId(),
+                d.getTitle(),
+                d.getContent(),
+                d.isAllowComment(),
+                d.isAiRefined(),
+                d.getCreatedAt(),
+                viewedIds.contains(d.getId()),
+                d.getTotalReactionCount(),
+                d.getCommentCount()
+        ));
     }
 
     @Transactional
@@ -127,7 +120,10 @@ public class DiaryService {
         diaryRepository.delete(diary);
     }
 
-    // ===== 내부 헬퍼 =====
+    @Transactional
+    public void markAsViewed(Long userId, Long diaryId) {
+        diaryViewService.markAsViewed(userId, diaryId);
+    }
 
     private User getUser(Long userId) {
         return userRepository.findById(userId)
@@ -144,10 +140,4 @@ public class DiaryService {
             throw new AccessDeniedException(UNAUTHORIZED);
         }
     }
-
-    @Transactional
-    public void markAsViewed(Long userId, Long diaryId) {
-        diaryViewService.markAsViewed(userId, diaryId);
-    }
-
 }
