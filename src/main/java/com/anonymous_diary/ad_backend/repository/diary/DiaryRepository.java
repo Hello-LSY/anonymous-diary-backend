@@ -11,4 +11,6 @@ import java.util.List;
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
     List<Diary> findAllByUserOrderByCreatedAtDesc(User user);
     Page<Diary> findAllByVisibleTrue(Pageable pageable);
+
+    Page<Diary> findAllByUser(User user, Pageable pageable);
 }

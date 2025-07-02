@@ -70,23 +70,24 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserDiarySummaryDto> getMyDiarySummaries(Long userId) {
+    public Page<UserDiarySummaryDto> getMyDiarySummaries(Long userId, int page, int size) {
         User user = getUser(userId);
-        List<Diary> diaries = diaryRepository.findAllByUserOrderByCreatedAtDesc(user);
-        return diaries.stream()
-                .map(d -> new UserDiarySummaryDto(
-                        d.getId(),
-                        d.getTitle(),
-                        d.getContent(),
-                        d.isAllowComment(),
-                        d.isVisible(),
-                        d.isAiRefined(),
-                        d.getCreatedAt(),
-                        d.getTotalReactionCount(),
-                        d.getCommentCount()
-                ))
-                .toList();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Diary> diaries = diaryRepository.findAllByUser(user, pageable);
+
+        return diaries.map(d -> new UserDiarySummaryDto(
+                d.getId(),
+                d.getTitle(),
+                d.getContent(),
+                d.isAllowComment(),
+                d.isVisible(),
+                d.isAiRefined(),
+                d.getCreatedAt(),
+                d.getTotalReactionCount(),
+                d.getCommentCount()
+        ));
     }
+
 
     @Transactional(readOnly = true)
     public List<VisibleDiarySummaryDto> getPublicDiarySummaries(Long userId, int page, int size) {

@@ -1,11 +1,10 @@
 package com.anonymous_diary.ad_backend.controller.diary.crud;
 
 import com.anonymous_diary.ad_backend.controller.diary.dto.*;
-import com.anonymous_diary.ad_backend.domain.diary.Diary;
 import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.diary.DiaryService;
-import com.anonymous_diary.ad_backend.service.diary.DiaryViewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +36,12 @@ public class DiaryController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<UserDiarySummaryDto>> getMyDiaries(
-            @AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(diaryService.getMyDiarySummaries(principal.id()));
+    public ResponseEntity<Page<UserDiarySummaryDto>> getMyDiaries(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(diaryService.getMyDiarySummaries(principal.id(), page, size));
     }
 
     @GetMapping("/public")
