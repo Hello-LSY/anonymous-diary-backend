@@ -38,4 +38,12 @@ public class AiUsageLog {
                 .usedAt(LocalDateTime.now())
                 .build();
     }
+
+    public static AiUsageLog createDuringWriting(User user, RefineType refineType) {
+        return AiUsageLog.builder()
+                .user(user)
+                .refineType(refineType)
+                .usedAt(LocalDateTime.now())
+                .build();
+    }
 }

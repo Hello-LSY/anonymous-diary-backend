@@ -12,23 +12,26 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/diaries/{diaryId}/refine")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class RefineController {
 
     private final GeminiRefineService refineService;
 
-    @PostMapping
-    public ResponseEntity<RefineResponse> refineDiary(
-            @PathVariable Long diaryId,
+    @PostMapping("/ai/refine")
+    public ResponseEntity<RefineResponse> refineContentDuringWriting(
             @RequestBody RefineRequest request,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        GeminiRefineResult result = refineService.refineDiary(principal.id(), diaryId, request.refineType());
+        GeminiRefineResult result = refineService.refineContentDuringWriting(
+                principal.id(),
+                request.content(),
+                request.refineType()
+        );
         return ResponseEntity.ok(new RefineResponse(result.originalContent(), result.refinedContent()));
     }
 
-    @PatchMapping
+    @PatchMapping("/diaries/{diaryId}/refine")
     public ResponseEntity<Void> updateRefinedDiary(
             @PathVariable Long diaryId,
             @RequestBody RefineUpdateRequest request,
