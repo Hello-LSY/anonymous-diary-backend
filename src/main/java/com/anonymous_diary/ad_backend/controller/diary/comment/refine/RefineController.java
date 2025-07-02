@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import static com.anonymous_diary.ad_backend.domain.common.constants.AiConstants.DAILY_REFINE_LIMIT;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -40,4 +43,19 @@ public class RefineController {
         refineService.updateRefinedContent(principal.id(), diaryId, request.refinedContent());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/ai/refine/usage")
+    public ResponseEntity<Map<String, Integer>> getRefineUsage(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        int used = refineService.getTodayUsageCount(principal.id());
+        int remaining = refineService.getRemainingUsageCount(principal.id());
+        Map<String, Integer> response = Map.of(
+                "used", used,
+                "remaining", remaining,
+                "limit", DAILY_REFINE_LIMIT
+        );
+        return ResponseEntity.ok(response);
+    }
+
 }

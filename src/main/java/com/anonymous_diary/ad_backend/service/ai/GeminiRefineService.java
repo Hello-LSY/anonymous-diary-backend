@@ -14,6 +14,8 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import static com.anonymous_diary.ad_backend.domain.common.constants.AiConstants.DAILY_REFINE_LIMIT;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,7 +26,6 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class GeminiRefineService {
 
-    private static final int DAILY_LIMIT = 5;
     private static final String ERR_DIARY_NOT_FOUND = "일기를 찾을 수 없습니다.";
     private static final String ERR_DIARY_FORBIDDEN = "본인의 일기만 다듬을 수 있습니다.";
     private static final String ERR_LIMIT_EXCEEDED = "AI 다듬기는 하루 최대 5회까지만 가능합니다.";
@@ -96,7 +97,7 @@ public class GeminiRefineService {
 
     private void checkUsageLimit(Long userId) {
         long usageCount = aiUsageLogRepository.countByUserIdAndDate(userId, LocalDate.now());
-        if (usageCount >= DAILY_LIMIT) {
+        if (usageCount >= DAILY_REFINE_LIMIT) {
             throw new IllegalStateException(ERR_LIMIT_EXCEEDED);
         }
     }
@@ -110,4 +111,15 @@ public class GeminiRefineService {
         }
         return diary;
     }
+
+    @Transactional(readOnly = true)
+    public int getTodayUsageCount(Long userId) {
+        return (int) aiUsageLogRepository.countByUserIdAndDate(userId, LocalDate.now());
+    }
+
+    @Transactional(readOnly = true)
+    public int getRemainingUsageCount(Long userId) {
+        return DAILY_REFINE_LIMIT - getTodayUsageCount(userId);
+    }
+
 }
