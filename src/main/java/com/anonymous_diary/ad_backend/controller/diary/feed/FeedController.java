@@ -4,6 +4,7 @@ import com.anonymous_diary.ad_backend.controller.diary.dto.VisibleDiarySummaryDt
 import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.diary.FeedService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,13 +23,14 @@ public class FeedController {
 
     // 무한스크롤
     @GetMapping("/recent")
-    public ResponseEntity<List<VisibleDiarySummaryDto>> getRecentFeed(
+    public ResponseEntity<Page<VisibleDiarySummaryDto>> getRecentFeed(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        List<VisibleDiarySummaryDto> feed = feedService.getRecentDiaries(principal.id(), page, size);
+        Page<VisibleDiarySummaryDto> feed = feedService.getRecentDiaries(principal.id(), page, size);
         return ResponseEntity.ok(feed);
     }
+
 
 }
