@@ -8,6 +8,8 @@ import com.anonymous_diary.ad_backend.repository.auth.UserRepository;
 import com.anonymous_diary.ad_backend.repository.diary.DiaryRepository;
 import com.anonymous_diary.ad_backend.repository.diary.DiaryViewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,11 +41,10 @@ public class DiaryViewService {
     }
 
     @Transactional(readOnly = true)
-    public List<Long> getViewedDiaryIds(Long userId) {
+    public Page<Long> getViewedDiaryIds(Long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
-        return diaryViewRepository.findAllByUser(user).stream()
-                .map(view -> view.getDiary().getId())
-                .toList();
+        return diaryViewRepository.findAllByUser(user, pageable)
+                .map(view -> view.getDiary().getId());
     }
 }
