@@ -4,6 +4,7 @@ import com.anonymous_diary.ad_backend.controller.diary.dto.*;
 import com.anonymous_diary.ad_backend.domain.diary.Diary;
 import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.diary.DiaryService;
+import com.anonymous_diary.ad_backend.service.diary.DiaryViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,6 +30,9 @@ public class DiaryController {
     public ResponseEntity<DiaryDetailDto> getDiary(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal principal) {
+
+        diaryService.markAsViewed(principal.id(), id);
+
         return ResponseEntity.ok(diaryService.getDiaryDetailWithAccess(id, principal.id()));
     }
 

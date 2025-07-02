@@ -28,6 +28,8 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final UserRepository userRepository;
     private final DiaryViewRepository diaryViewRepository;
+    private final DiaryViewService diaryViewService;
+
 
     @Transactional
     public DiaryCreateResponse createDiary(Long userId, DiaryCreateRequest request) {
@@ -141,4 +143,10 @@ public class DiaryService {
             throw new AccessDeniedException(UNAUTHORIZED);
         }
     }
+
+    @Transactional
+    public void markAsViewed(Long userId, Long diaryId) {
+        diaryViewService.markAsViewed(userId, diaryId);
+    }
+
 }
