@@ -1,5 +1,6 @@
 package com.anonymous_diary.ad_backend.service.diary;
 
+import com.anonymous_diary.ad_backend.controller.diary.dto.VisibleDiarySummaryDto;
 import com.anonymous_diary.ad_backend.domain.auth.User;
 import com.anonymous_diary.ad_backend.domain.diary.Bookmark;
 import com.anonymous_diary.ad_backend.domain.diary.Diary;
@@ -7,6 +8,7 @@ import com.anonymous_diary.ad_backend.repository.auth.UserRepository;
 import com.anonymous_diary.ad_backend.repository.diary.BookmarkRepository;
 import com.anonymous_diary.ad_backend.repository.diary.DiaryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,11 +51,30 @@ public class BookmarkService {
     }
 
     @Transactional(readOnly = true)
-    public List<Long> getBookmarkedDiaryIds(Long userId) {
+    public Slice<VisibleDiarySummaryDto> getBookmarkedDiaries(Long userId, int page, int size) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
-        return bookmarkRepository.findAllByUser(user).stream()
-                .map(b -> b.getDiary().getId())
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "diary.createdAt"));
+        Slice<Bookmark> bookmarks = bookmarkRepository.findAllByUser(user, pageable);
+
+        List<VisibleDiarySummaryDto> content = bookmarks.stream()
+                .map(b -> {
+                    Diary d = b.getDiary();
+                    return new VisibleDiarySummaryDto(
+                            d.getId(),
+                            d.getTitle(),
+                            d.getContent(),
+                            d.isAllowComment(),
+                            d.isAiRefined(),
+                            d.getCreatedAt(),
+                            true, // 북마크 목록이므로 viewed = true 로 고정
+                            d.getTotalReactionCount(),
+                            d.getCommentCount()
+                    );
+                })
                 .toList();
+
+        return new SliceImpl<>(content, pageable, bookmarks.hasNext());
     }
 }
