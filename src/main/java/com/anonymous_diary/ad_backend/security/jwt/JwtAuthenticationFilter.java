@@ -30,7 +30,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, UserRepository userRepository) {
         this.tokenProvider = tokenProvider;
         this.userRepository = userRepository;
-        log.info("[JwtFilter] 필터 생성됨");
     }
 
     @Override
@@ -57,10 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                log.debug("[JwtFilter] SecurityContext에 인증 객체 설정 완료 (userId: {})", userId);
             }
         } catch (Exception ex) {
-            log.warn("[JwtFilter] JWT 처리 중 예외 발생: {}", ex.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"message\": \"Invalid or expired JWT token\"}");
