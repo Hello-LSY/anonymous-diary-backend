@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_SIZE;
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_START;
+
 @RestController
 @RequestMapping("/api/views")
 @RequiredArgsConstructor
@@ -33,8 +36,8 @@ public class DiaryViewController {
     @GetMapping("/me")
     public ResponseEntity<Slice<Long>> getViewedDiaries(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = PAGE_START) int page,
+            @RequestParam(defaultValue = PAGE_SIZE) int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "viewedAt"));
         Slice<Long> viewedIds = diaryViewService.getViewedDiaryIds(principal.id(), pageable);

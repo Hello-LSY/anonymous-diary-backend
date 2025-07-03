@@ -4,12 +4,16 @@ import com.anonymous_diary.ad_backend.controller.diary.dto.*;
 import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.diary.DiaryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_SIZE;
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_START;
 
 @RestController
 @RequestMapping("/api/diaries")
@@ -38,8 +42,8 @@ public class DiaryController {
     @GetMapping("/me")
     public ResponseEntity<Slice<UserDiarySummaryDto>> getMyDiaries(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = PAGE_START) int page,
+            @RequestParam(defaultValue = PAGE_SIZE) int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Slice<UserDiarySummaryDto> diaries = diaryService.getMyDiarySummaries(principal.id(), pageable);
@@ -49,8 +53,8 @@ public class DiaryController {
 
     @GetMapping("/public")
     public ResponseEntity<Slice<VisibleDiarySummaryDto>> getPublicDiaries(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = PAGE_START) int page,
+            @RequestParam(defaultValue = PAGE_SIZE) int size,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -59,12 +63,12 @@ public class DiaryController {
     }
 
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Void> updateDiary(
             @PathVariable Long id,
             @RequestBody DiaryUpdateRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        diaryService.updateDiary(id, principal.id(), request);
+        diaryService.patchDiary(id, principal.id(), request);
         return ResponseEntity.noContent().build();
     }
 

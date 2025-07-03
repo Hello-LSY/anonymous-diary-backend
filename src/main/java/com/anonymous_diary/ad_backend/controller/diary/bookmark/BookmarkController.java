@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_SIZE;
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_START;
+
 @RestController
 @RequestMapping("/api/bookmarks")
 @RequiredArgsConstructor
@@ -38,8 +41,10 @@ public class BookmarkController {
     @GetMapping("/me")
     public ResponseEntity<Slice<VisibleDiarySummaryDto>> getBookmarkedDiaries(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = PAGE_START) int page,
+            @RequestParam(defaultValue = PAGE_SIZE
+
+            ) int size
     ) {
         Slice<VisibleDiarySummaryDto> bookmarks = bookmarkService.getBookmarkedDiaries(principal.id(), page, size);
         return ResponseEntity.ok(bookmarks);
