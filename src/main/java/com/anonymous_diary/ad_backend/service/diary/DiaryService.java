@@ -103,15 +103,14 @@ public class DiaryService {
         ));
     }
 
+
     @Transactional
-    public void updateDiary(Long diaryId, Long userId, DiaryUpdateRequest request) {
+    public void patchDiary(Long diaryId, Long userId, DiaryUpdateRequest request) {
         Diary diary = getDiary(diaryId);
         validateOwnership(diary, userId);
-        if (!diary.isEditable()) {
-            throw new IllegalStateException(EDIT_EXPIRED);
-        }
-        diary.update(request.title(), request.content(), request.allowComment(), request.visible());
+        diary.patch(request.title(), request.content(), request.allowComment(), request.visible());
     }
+
 
     @Transactional
     public void deleteDiary(Long diaryId, Long userId) {

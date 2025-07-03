@@ -1,12 +1,11 @@
 package com.anonymous_diary.ad_backend.domain.diary;
 
 import com.anonymous_diary.ad_backend.domain.auth.User;
-import com.anonymous_diary.ad_backend.domain.diary.Comment;
-import com.anonymous_diary.ad_backend.domain.diary.Reaction;
 import com.anonymous_diary.ad_backend.domain.common.enums.ReactionType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -49,6 +48,10 @@ public class Diary {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
     @Column(nullable = false)
     private int commentCount = 0;
 
@@ -61,19 +64,29 @@ public class Diary {
     @Column(nullable = false)
     private int cheerCount = 0;
 
+    @Builder.Default
     @OneToMany(mappedBy = "diary", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "diary", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Reaction> reactions = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "diary", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Bookmark> bookmarks = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "diary", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<DiaryView> diaryViews = new ArrayList<>();
+
     // ===== 메서드 =====
 
-    public void update(String title, String content, boolean allowComment, boolean visible) {
-        this.title = title;
-        this.content = content;
-        this.allowComment = allowComment;
-        this.visible = visible;
+    public void patch(String title, String content, Boolean allowComment, Boolean visible) {
+        if (title != null) this.title = title;
+        if (content != null) this.content = content;
+        if (allowComment != null) this.allowComment = allowComment;
+        if (visible != null) this.visible = visible;
     }
 
     public boolean isOwnedBy(Long userId) {
@@ -82,10 +95,6 @@ public class Diary {
 
     public boolean isEditable() {
         return this.createdAt.isAfter(LocalDateTime.now().minusHours(1));
-    }
-
-    public void updateContent(String newContent) {
-        this.content = newContent;
     }
 
     public void markAsAiRefined() {
@@ -118,5 +127,9 @@ public class Diary {
 
     public int getTotalReactionCount() {
         return likeCount + sadCount + cheerCount;
+    }
+
+    public void updateContent(String refinedContent) {
+        this.content = refinedContent;
     }
 }
