@@ -4,7 +4,7 @@ spring:
   config:
     activate:
       on-profile: prod
-    import: optional:file:.env.properties # 운영서버에 맞는 프로퍼티 쓰기
+    import: optional:file:.env-prod.properties # 운영서버에 맞는 프로퍼티 쓰기
 
   datasource:
     url: ${DB_URL}
@@ -53,3 +53,4 @@ server:
 app:
   magic-link:
     base-url: https://yourdomain.com # 배포하면 운영 도메인으로 변경하기
+    enabled: true

@@ -40,6 +40,7 @@ bin/
 .env
 .env.*
 .env.properties
+.env-prod.properties
 src/main/resources/.env.properties
 
 ### GCP Credentials (절대 커밋 금지) ###

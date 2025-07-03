@@ -2,4 +2,4 @@
 
 spring:
   profiles:
-    active: local # 서버 배포 시엔 명시하지 않거나 prod로 외부 지정
+    active: prod # 서버 배포 시엔 명시하지 않거나 prod로 외부 지정
