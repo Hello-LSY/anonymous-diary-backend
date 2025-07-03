@@ -27,7 +27,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    private static final long REFRESH_EXPIRATION_DAYS = 7;
+    private static final long REFRESH_EXPIRATION_DAYS = 28;
 
     @Transactional
     public AuthResponse verifyTokenAndLogin(String token, HttpServletResponse response) {
@@ -47,7 +47,6 @@ public class AuthService {
 
         String jwt = jwtTokenProvider.generateToken(user.getId());
 
-        // 기존 Refresh Token 제거 후 새로 발급
         refreshTokenRepository.deleteByUser(user);
 
         String refreshValue = UUID.randomUUID().toString();
@@ -66,7 +65,7 @@ public class AuthService {
     }
 
     @Transactional
-    public String refresh(String refreshTokenValue, HttpServletResponse response) {
+    public AuthResponse refresh(String refreshTokenValue, HttpServletResponse response) {
         Optional<RefreshToken> optional = refreshTokenRepository.findByToken(refreshTokenValue);
         if (optional.isEmpty() || optional.get().isExpired()) {
             throw new InvalidTokenException("유효하지 않거나 만료된 Refresh Token 입니다.");
@@ -75,7 +74,6 @@ public class AuthService {
         User user = optional.get().getUser();
         String newAccessToken = jwtTokenProvider.generateToken(user.getId());
 
-        // Refresh Token 재발급
         refreshTokenRepository.delete(optional.get());
         String newRefreshValue = UUID.randomUUID().toString();
         RefreshToken newRefreshToken = RefreshToken.builder()
@@ -87,7 +85,7 @@ public class AuthService {
 
         setRefreshTokenCookie(newRefreshValue, response);
 
-        return newAccessToken;
+        return new AuthResponse(newAccessToken, user.getId(), user.getNickname());
     }
 
     @Transactional
@@ -98,9 +96,9 @@ public class AuthService {
     }
 
     private void setRefreshTokenCookie(String value, HttpServletResponse response) {
-        response.addHeader("Set-Cookie",
-                "refreshToken=" + value +
-                        "; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=" + (REFRESH_EXPIRATION_DAYS * 24 * 60 * 60));
+        String attributes = "HttpOnly; Path=/; Max-Age=" + (REFRESH_EXPIRATION_DAYS * 24 * 60 * 60)
+                + "; Secure; SameSite=None";
+        response.addHeader("Set-Cookie", "refreshToken=" + value + "; " + attributes);
     }
 
     private User registerNewUser(String email) {

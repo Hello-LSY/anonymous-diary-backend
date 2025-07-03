@@ -47,11 +47,12 @@ public class AuthController {
 
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthService.AuthResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = CookieUtils.extractRefreshToken(request);
-        String newAccessToken = authService.refresh(refreshToken, response);
-        return ResponseEntity.ok(new TokenResponse(newAccessToken));
+        AuthService.AuthResponse authResponse = authService.refresh(refreshToken, response);
+        return ResponseEntity.ok(authResponse);
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<StatusResponse> logout(@AuthenticationPrincipal UserPrincipal principal) {
