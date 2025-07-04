@@ -52,5 +52,5 @@ server:
 
 app:
   magic-link:
-    base-url: https://anonymousdiary.vercel.app
+    base-url: https://anonymous-diary-backend.onrender.com
     enabled: true
