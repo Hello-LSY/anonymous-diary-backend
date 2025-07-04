@@ -5,6 +5,8 @@ spring:
     activate:
       on-profile: prod
     import: optional:file:/etc/secrets/.env-prod.properties
+  jackson:
+    time-zone: Asia/Seoul
 
   datasource:
     url: ${DB_URL}
