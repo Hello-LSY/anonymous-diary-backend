@@ -52,5 +52,5 @@ server:
 
 app:
   magic-link:
-    base-url: https://yourdomain.com   # 운영 도메인으로 교체
+    base-url: https://anonymousdiary.vercel.app
     enabled: true
