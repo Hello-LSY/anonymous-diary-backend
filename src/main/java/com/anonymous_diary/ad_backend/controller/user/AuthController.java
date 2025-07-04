@@ -37,7 +37,7 @@ public class AuthController {
         var authResponse = authService.verifyTokenAndLogin(token, response);
 
         // 프론트 콜백 경로로 전달할 URL
-        String redirectUrl = "http://localhost:3000/login/callback"
+        String redirectUrl = "https://anonymousdiary.vercel.app/login/callback"
                 + "?accessToken=" + authResponse.accessToken()
                 + "&id=" + authResponse.id()
                 + "&nickname=" + URLEncoder.encode(authResponse.nickname(), StandardCharsets.UTF_8);
