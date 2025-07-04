@@ -12,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_SIZE;
-import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_START;
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingConstants.PAGE_SIZE;
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingConstants.PAGE_START;
 
 @RestController
 @RequestMapping("/api/diaries")

@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
-import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_SIZE;
-import static com.anonymous_diary.ad_backend.domain.common.constants.PagingContants.PAGE_START;
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingConstants.PAGE_SIZE;
+import static com.anonymous_diary.ad_backend.domain.common.constants.PagingConstants.PAGE_START;
 
 @RestController
 @RequestMapping("/api/diaries/feed")
