@@ -5,6 +5,7 @@ name: Keep Render Alive
 on:
   schedule:
     - cron: '*/14 * * * *'
+  workflow_dispatch:
 
 jobs:
   ping:
@@ -14,3 +15,4 @@ jobs:
       - name: Curl Render Health Endpoint
         run: |
           curl -s -o /dev/null -w "%{http_code}\n" https://anonymous-diary-backend.onrender.com/api/health
+
