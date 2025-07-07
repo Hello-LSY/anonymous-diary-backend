@@ -21,13 +21,13 @@
 - 본인 일기만 수정/삭제 가능
 
 ### 👀 일기 뷰 (Diary View)
-- 최근 7일 내 랜덤 일기 조회
+- 최근자 일기 조회(무한 스크롤)
 - 사용자가 본 일기 기록 관리
 - 북마크 기능 제공
 
 ### 💬 댓글 (Comment)
-- 특정 일기에 대한 댓글 작성 / 조회 / 수정 / 삭제
-- 본인 댓글만 수정/삭제 가능
+- 특정 일기에 대한 댓글 작성 / 조회 / 삭제
+- 본인 댓글만 삭제 가능
 
 ### ❤️ 반응 (Reaction)
 - 일기에 좋아요 / 공감 등의 반응 추가 (중복 불가)
@@ -66,7 +66,7 @@
 루트 또는 `src/main/resources`에 다음 환경 변수를 설정
 
 ```properties
-DB_URL=jdbc:postgresql://localhost:5432/mmdb
+DB_URL=jdbc:postgresql://localhost:5432/db
 DB_USERNAME=your_db_user
 DB_PASSWORD=your_db_password
 
@@ -92,6 +92,14 @@ GEMINI_MODEL=gemini-2.0-flash
 * [Spring AI + Gemini 사용해보기](https://velog.io/@sin_0/Spring-Ai-Gemini-%EC%82%AC%EC%9A%A9%ED%95%B4%EB%B3%B4%EA%B8%B0)
 * [Spring AI 공식 문서](https://spring.io/projects/spring-ai)
 * [Gemini API 공식 문서](https://docs.spring.io/spring-ai/reference/api/chat/vertexai-gemini-chat.html)
+
+---
+
+## 🪐 배포
+
+* **Render**를 이용한 백엔드 자동 CI/CD
+* **Neon**을 이용한 PostgreSQL 클라우드 DB 연동
+* 환경변수는 Render/Neon 환경에 맞춰 별도 관리
 
 ---
 
