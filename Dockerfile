@@ -3,7 +3,7 @@ FROM gradle:8.8.0-jdk17 AS build
 WORKDIR /workspace
 
 # gradle wrapper 및 빌드 파일 복사
-COPY build.gradle settings.gradle gradle.properties ./
+COPY build.gradle settings.gradle ./
 COPY gradle ./gradle
 
 # dependencies 캐싱을 위한 의존성 다운로드
