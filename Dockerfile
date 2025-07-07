@@ -8,7 +8,7 @@ COPY gradle ./gradle
 
 # dependencies 캐싱을 위한 의존성 다운로드
 RUN --mount=type=cache,target=/root/.gradle \
-    gradle build --no-daemon -x test
+    gradle build --no-daemon -x test || true
 
 # 소스 복사 및 빌드
 COPY . .
