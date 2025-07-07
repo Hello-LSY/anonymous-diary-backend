@@ -1,0 +1,16 @@
+# .github/workflows/render-ping.yml
+
+name: Keep Render Alive
+
+on:
+  schedule:
+    - cron: '*/14 * * * *'
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Curl Render Health Endpoint
+        run: |
+          curl -s -o /dev/null -w "%{http_code}\n" https://anonymous-diary-backend.onrender.com/api/health
