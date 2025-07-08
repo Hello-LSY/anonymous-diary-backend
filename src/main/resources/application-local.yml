@@ -54,6 +54,9 @@ app:
     base-url: http://localhost:8080
     enabled: true
 
+frontend:
+  base-url: http://localhost:3000
+
 #logging:
 #  level:
 #    com.mumyungdiary.mm_backend.security.jwt: DEBUG

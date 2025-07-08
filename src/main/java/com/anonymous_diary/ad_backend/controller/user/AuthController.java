@@ -2,7 +2,6 @@ package com.anonymous_diary.ad_backend.controller.user;
 
 import com.anonymous_diary.ad_backend.controller.user.dto.EmailRequest;
 import com.anonymous_diary.ad_backend.controller.user.dto.StatusResponse;
-import com.anonymous_diary.ad_backend.controller.user.dto.TokenResponse;
 import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.auth.AuthService;
 import com.anonymous_diary.ad_backend.service.auth.MagicLinkService;
@@ -10,6 +9,7 @@ import com.anonymous_diary.ad_backend.util.CookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import static com.anonymous_diary.ad_backend.domain.common.constants.URLConstants.LOCAL_URL;
-import static com.anonymous_diary.ad_backend.domain.common.constants.URLConstants.SERVER_URL;
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -28,6 +25,9 @@ public class AuthController {
 
     private final AuthService authService;
     private final MagicLinkService magicLinkService;
+
+    @Value("${frontend.base-url}")
+    private String frontendBaseUrl;
 
     @PostMapping("/request-link")
     public ResponseEntity<StatusResponse> requestMagicLink(@RequestBody EmailRequest request) {
@@ -39,8 +39,7 @@ public class AuthController {
     public void verify(@RequestParam String token, HttpServletResponse response) throws IOException {
         var authResponse = authService.verifyTokenAndLogin(token, response);
 
-        // 프론트 콜백 경로로 전달할 URL
-        String redirectUrl = LOCAL_URL + "/login/callback"
+        String redirectUrl = frontendBaseUrl + "/login/callback"
                 + "?accessToken=" + authResponse.accessToken()
                 + "&id=" + authResponse.id()
                 + "&nickname=" + URLEncoder.encode(authResponse.nickname(), StandardCharsets.UTF_8);
@@ -48,14 +47,12 @@ public class AuthController {
         response.sendRedirect(redirectUrl);
     }
 
-
     @PostMapping("/refresh")
     public ResponseEntity<AuthService.AuthResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = CookieUtils.extractRefreshToken(request);
         AuthService.AuthResponse authResponse = authService.refresh(refreshToken, response);
         return ResponseEntity.ok(authResponse);
     }
-
 
     @PostMapping("/logout")
     public ResponseEntity<StatusResponse> logout(@AuthenticationPrincipal UserPrincipal principal) {
