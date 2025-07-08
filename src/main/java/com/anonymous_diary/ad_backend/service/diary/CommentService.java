@@ -25,7 +25,7 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public CommentCreateResponse createComment(Long userId, Long diaryId, String content) {
+    public CommentCreateResponse createComment(Long userId, Long diaryId, String content, Long parentCommentId) {
         User user = getUser(userId);
         Diary diary = getDiary(diaryId);
 
@@ -37,10 +37,21 @@ public class CommentService {
             throw new AccessDeniedException("비공개 일기에는 본인만 댓글을 달 수 있습니다.");
         }
 
+        Comment parent = null;
+        if (parentCommentId != null) {
+            parent = commentRepository.findById(parentCommentId)
+                    .orElseThrow(() -> new NoSuchElementException("부모 댓글을 찾을 수 없습니다."));
+            // 1-depth 제한: 대댓글에는 대댓글 작성 불가
+            if (parent.getParent() != null) {
+                throw new IllegalStateException("대댓글에는 대댓글을 작성할 수 없습니다.");
+            }
+        }
+
         Comment comment = Comment.builder()
                 .user(user)
                 .diary(diary)
                 .content(content)
+                .parent(parent) // parent 연결
                 .build();
 
         Long commentId = commentRepository.save(comment).getId();
@@ -61,7 +72,8 @@ public class CommentService {
                         c.getId(),
                         c.getUser().getNickname(),
                         c.getContent(),
-                        c.getCreatedAt()
+                        c.getCreatedAt(),
+                        c.getParent() != null ? c.getParent().getId() : null // parentCommentId 추가
                 ))
                 .toList();
     }
@@ -85,7 +97,7 @@ public class CommentService {
         diaryRepository.save(diary);
     }
 
-    // ===== 내부 헬퍼 메서드 =====
+    // ===== 내부 헬퍼 =====
 
     private User getUser(Long userId) {
         return userRepository.findById(userId)

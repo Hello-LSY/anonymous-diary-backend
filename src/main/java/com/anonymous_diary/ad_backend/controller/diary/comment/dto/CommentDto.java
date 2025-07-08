@@ -6,5 +6,6 @@ public record CommentDto(
         Long id,
         String nickname,
         String content,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Long parentCommentId
 ) {}
