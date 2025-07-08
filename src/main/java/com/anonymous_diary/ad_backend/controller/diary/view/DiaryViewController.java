@@ -1,6 +1,7 @@
 package com.anonymous_diary.ad_backend.controller.diary.view;
 
 
+import com.anonymous_diary.ad_backend.controller.diary.dto.VisibleDiarySummaryDto;
 import com.anonymous_diary.ad_backend.security.auth.UserPrincipal;
 import com.anonymous_diary.ad_backend.service.diary.DiaryViewService;
 import jakarta.validation.constraints.NotNull;
@@ -42,6 +43,16 @@ public class DiaryViewController {
         return ResponseEntity.ok(viewedIds);
     }
 
+    @GetMapping("/me/details")
+    public ResponseEntity<Slice<VisibleDiarySummaryDto>> getRecentlyViewedDiaries(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam(defaultValue = PAGE_START) int page,
+            @RequestParam(defaultValue = PAGE_SIZE) int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "viewedAt"));
+        Slice<VisibleDiarySummaryDto> diaries = diaryViewService.getRecentlyViewedDiaries(principal.id(), pageable);
+        return ResponseEntity.ok(diaries);
+    }
 
 
 }

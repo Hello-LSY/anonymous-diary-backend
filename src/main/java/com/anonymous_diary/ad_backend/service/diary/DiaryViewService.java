@@ -1,6 +1,7 @@
 package com.anonymous_diary.ad_backend.service.diary;
 
 
+import com.anonymous_diary.ad_backend.controller.diary.dto.VisibleDiarySummaryDto;
 import com.anonymous_diary.ad_backend.domain.auth.User;
 import com.anonymous_diary.ad_backend.domain.diary.Diary;
 import com.anonymous_diary.ad_backend.domain.diary.DiaryView;
@@ -43,6 +44,30 @@ public class DiaryViewService {
                     .build());
         }
     }
+
+    @Transactional(readOnly = true)
+    public Slice<VisibleDiarySummaryDto> getRecentlyViewedDiaries(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+
+        Slice<DiaryView> diaryViews = diaryViewRepository.findAllByUser(user, pageable);
+
+        return diaryViews.map(dv -> {
+            Diary d = dv.getDiary();
+            return new VisibleDiarySummaryDto(
+                    d.getId(),
+                    d.getTitle(),
+                    d.getContent(),
+                    d.isAllowComment(),
+                    d.isAiRefined(),
+                    d.getCreatedAt(),
+                    true, // viewed는 무조건 true (최근 본 일기이므로)
+                    d.getTotalReactionCount(),
+                    d.getCommentCount()
+            );
+        });
+    }
+
 
     @Transactional(readOnly = true)
     public Slice<Long> getViewedDiaryIds(Long userId, Pageable pageable) {
