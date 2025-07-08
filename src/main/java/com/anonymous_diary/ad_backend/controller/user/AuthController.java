@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import static com.anonymous_diary.ad_backend.domain.common.constants.URLConstants.LOCAL_URL;
 import static com.anonymous_diary.ad_backend.domain.common.constants.URLConstants.SERVER_URL;
 
 @RestController
@@ -39,7 +40,7 @@ public class AuthController {
         var authResponse = authService.verifyTokenAndLogin(token, response);
 
         // 프론트 콜백 경로로 전달할 URL
-        String redirectUrl = SERVER_URL + "/login/callback"
+        String redirectUrl = LOCAL_URL + "/login/callback"
                 + "?accessToken=" + authResponse.accessToken()
                 + "&id=" + authResponse.id()
                 + "&nickname=" + URLEncoder.encode(authResponse.nickname(), StandardCharsets.UTF_8);

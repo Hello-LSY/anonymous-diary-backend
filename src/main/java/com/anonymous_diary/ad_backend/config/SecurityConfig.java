@@ -19,6 +19,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static com.anonymous_diary.ad_backend.domain.common.constants.URLConstants.LOCAL_URL;
+import static com.anonymous_diary.ad_backend.domain.common.constants.URLConstants.SERVER_URL;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -59,7 +61,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://anonymousdiary.vercel.app"));
+        configuration.setAllowedOrigins(List.of(SERVER_URL,LOCAL_URL));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // Authorization 헤더 및 쿠키 전송 허용
