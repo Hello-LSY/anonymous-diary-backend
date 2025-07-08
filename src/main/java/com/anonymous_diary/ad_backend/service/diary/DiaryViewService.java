@@ -8,14 +8,14 @@ import com.anonymous_diary.ad_backend.repository.auth.UserRepository;
 import com.anonymous_diary.ad_backend.repository.diary.DiaryRepository;
 import com.anonymous_diary.ad_backend.repository.diary.DiaryViewRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class DiaryViewService {
@@ -31,11 +31,15 @@ public class DiaryViewService {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new NoSuchElementException("일기를 찾을 수 없습니다."));
 
-        boolean alreadyExists = diaryViewRepository.findByUserAndDiary(user, diary).isPresent();
-        if (!alreadyExists) {
+        Optional<DiaryView> existingView = diaryViewRepository.findByUserAndDiary(user, diary);
+        if (existingView.isPresent()) {
+            existingView.get().updateViewedAtToNow();
+            diaryViewRepository.save(existingView.get()); // 강제 flush로 갱신 반영
+        } else {
             diaryViewRepository.save(DiaryView.builder()
                     .user(user)
                     .diary(diary)
+                    .viewedAt(LocalDateTime.now())
                     .build());
         }
     }

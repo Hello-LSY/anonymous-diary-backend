@@ -1,17 +1,13 @@
 package com.anonymous_diary.ad_backend.domain.diary;
 
-
 import com.anonymous_diary.ad_backend.domain.auth.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "diary_views", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "diary_id"}))
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -28,7 +24,10 @@ public class DiaryView {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Diary diary;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private LocalDateTime viewedAt;
+
+    public void updateViewedAtToNow() {
+        this.viewedAt = LocalDateTime.now();
+    }
 }
