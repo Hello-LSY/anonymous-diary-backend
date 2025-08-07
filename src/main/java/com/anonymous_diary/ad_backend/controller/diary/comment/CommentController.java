@@ -27,7 +27,8 @@ public class CommentController {
         CommentCreateResponse response = commentService.createComment(
                 principal.id(),
                 diaryId,
-                request.content()
+                request.content(),
+                request.parentCommentId() // 대댓글용 parentCommentId
         );
         return ResponseEntity.ok(response);
     }

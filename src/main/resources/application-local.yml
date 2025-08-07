@@ -1,12 +1,9 @@
-# application-prod.yml
-
+# application-local.yml
 spring:
   config:
     activate:
-      on-profile: prod
-    import: optional:file:/etc/secrets/.env-prod.properties
-  jackson:
-    time-zone: Asia/Seoul
+      on-profile: local
+    import: optional:file:.env.properties
 
   datasource:
     url: ${DB_URL}
@@ -15,8 +12,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
-    show-sql: false
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
@@ -35,27 +32,32 @@ spring:
   ai:
     vertex:
       ai:
-        credentials-uri: ${GCP_PATH:/etc/secrets/ad-ai-client.json}
+        credentials-uri: ${GCP_PATH}
         gemini:
           project-id: ${GCP_PROJECT_ID}
           location: ${GCP_REGION}
       gemini:
-        chat:
-          options:
-            model: ${GEMINI_MODEL}
-            temperature: 0.7
+          chat:
+            options:
+              model: ${GEMINI_MODEL}
+              temperature: 0.7
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 3600000
+  expiration: 36000000
 
 server:
   port: 8080
 
 app:
   magic-link:
-    base-url: https://anonymous-diary-backend.onrender.com
+    base-url: http://localhost:8080
     enabled: true
 
 frontend:
-  base-url: https://anonymousdiary.vercel.app
+  base-url: http://localhost:3000
+
+#logging:
+#  level:
+#    com.mumyungdiary.mm_backend.security.jwt: DEBUG
+#    org.springframework.security: DEBUG
